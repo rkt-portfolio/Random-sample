@@ -1,0 +1,31 @@
+Reading in .xlsx files
+proc import 
+          datafile='\\smoke_test\bp.xlsx' 
+dbms=xlsx 
+          out=work.bp 
+          replace;
+run;
+
+-----------------------------------------------------------------------------------------------
+Details of unreconcilied accounts
+
+DATA TEST;
+SET SASDATA.JE_TOTAL;
+IF ACCOUNT IN ("330000" "480187" "110019" "590399");
+RUN;
+
+%MACRO EXPORT(ACCT,out);
+DATA TEST_&out.;
+SET TEST;
+IF ACCOUNT = "&ACCT.";
+RUN;
+PROC EXPORT Data=TEST_&out.
+  OUTFILE="&PATH.\Output\UNRECONCILED_DETAILS_VER1.xls"
+  DBMS=EXCEL REPLACE;
+ SHEET="&ACCT.";
+RUN;
+%MEND;
+%EXPORT(330000, 1); %EXPORT(480187,2);%EXPORT(110019,3); %EXPORT(590399,4);*%EXPORT(520214,5);
+-----------------------------------------------------------------------------------------------
+
+
